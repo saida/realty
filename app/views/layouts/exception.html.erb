@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#">
+<head>
+  <meta property="og:url" content=<%= request.url.inspect %>>
+  <% cache controller: params[:controller], action: params[:action], id: params[:id], action_suffix: "headers" do -%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" />
+    <%= meta_tags %>
+    <%= yield :head -%>
+    <!--[if lte ie 8]>
+      <%= stylesheet_link_tag "ie8", media: "all" %>
+    <![endif]-->
+    <!--[if lte ie 9]>
+      <%= stylesheet_link_tag "ie9", media: "all" %>
+    <![endif]-->
+    <%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true %>
+  <% end -%>
+  <%= csrf_meta_tags %>
+  <style>
+    #page_wrapper { margin-left: 200px; padding: 40px }
+    .main_content { margin-top: 40px }
+  </style>
+</head>
+<body>
+  <div id="page_wrapper">
+    <div id="page_wrapper2">
+      <header id="page_header">
+        <a class="logo" title="Books and Authors" href="/"><%= image_tag("logo.png", alt: "logo") %></a>
+        <nav class="h_nav">
+        </nav>
+      </header>
+      <%= yield %>
+    </div>
+  </div>
+</body></html>

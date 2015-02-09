@@ -1,0 +1,23 @@
+development:
+  adapter: sqlite3
+  encoding: utf8
+  database: db/realty
+  pool: 5
+  username: root
+  password: root
+
+test:
+  adapter: sqlite3
+  encoding: utf8
+  database: db/realty_test
+  pool: 5
+  username: root
+  password: root
+
+production:
+  adapter: sqlite3
+  encoding: utf8
+  database: db/realty
+  pool: 5
+  username: root
+  password: root

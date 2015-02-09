@@ -1,0 +1,65 @@
+:css
+  .modal-body ul.images { list-style: none; }
+  .modal-body ul.images li { display: inline-block; margin:0 20px 20px 0 }
+  .modal-body label { padding-top: 5px}
+  .modal-body label.col-md-3, label.col-md-4, label.col-md-6 { text-align: right; padding-left: 0 }
+  .modal-body label.col-md-2, .modal-body label.col-md-5 { padding-left: 0 }
+
+= admin_form_tag '', class: "form-horizontal" do
+  - Category.actives.each do |category|
+    - if category.un == 'service_type'
+      - items = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item)
+      - (3 - items.size).times { items << @property.property_category_items.build }
+      .row
+        %label.col-md-3= category.name
+        %label= @property.item(category.un)
+      .row
+        %label.col-md-3 Цена
+        %label.inline= "$ #{@property.price1}" if @property.price1?
+        %label.inline= ", $ #{@property.price2}" if @property.price2?
+        %label.inline= ", $ #{@property.price3}" if @property.price3? 
+        
+    - else
+      - item = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item).first || @property.property_category_items.build
+      .row
+        %label.col-md-3= category.name
+        %label= @property.item(category.un)
+
+    - if category.un == 'district'
+      .row
+        %label.col-md-3 Ориентиры
+        %label= @property.landmark
+  
+  .row
+    %label.col-md-3 Доп. инфо
+    %label= @property.more_info
+  
+  - if @images.present?
+    %h4.form-section Фотографии
+    %ul.images
+      - @images.each do |image|
+        %li= link_to (image_tag image.image.url), image.image.url(:original), target: '_blank'
+
+  %br/
+  - contact = @property.contact
+  .row
+    %label.col-md-3 Контакты
+    %label.col-md-5= contact.info
+    %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", contact_properties_path(contact), target: "_blank"
+    
+  %hr/
+  .row
+    %label.col-md-3 Дата заявки
+    %label.col-md-2= @property.request_date? ? Russian.l(@property.request_date) : nil
+    %label.col-md-4 Дата сдачи
+    %label.col-md-2= @property.rental_date? ? Russian.l(@property.rental_date) : nil
+  .row
+    %label.col-md-3 Дата общения
+    %label.col-md-2= @property.last_call_date? ? Russian.l(@property.last_call_date) : nil
+    %label.col-md-4 Дата освобождения
+    %label.col-md-2= @property.clear_date? ? Russian.l(@property.clear_date) : nil
+    
+  %hr/
+  .row
+    %label.col-md-3 Осмотрено
+    %label= @property.viewed ? 'Да' : 'Нет'

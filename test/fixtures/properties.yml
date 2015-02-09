@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  price1: MyString
+  price2: MyString
+  price3: MyString
+  landmark: MyText
+  more_info: MyText
+  last_call_date: 2013-12-14
+  request_date: 2013-12-14
+  clear_date: 2013-12-14
+  rental_date_from: 2013-12-14
+  rental_date_to: 2013-12-14
+  district_id: 1
+
+two:
+  price1: MyString
+  price2: MyString
+  price3: MyString
+  landmark: MyText
+  more_info: MyText
+  last_call_date: 2013-12-14
+  request_date: 2013-12-14
+  clear_date: 2013-12-14
+  rental_date_from: 2013-12-14
+  rental_date_to: 2013-12-14
+  district_id: 1

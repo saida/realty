@@ -1,0 +1,36 @@
+:css
+  .categories { margin-left: 10px }
+  .categories .form-group { margin-bottom: 5px; }
+  label.checkbox { font-size: 12px }
+  label.control-label.col-md-4 { text-align: right }
+  .categories .col-md-3, .categories .col-md-2, .categories .col-md-4 { padding-left: 5px; padding-right: 5px}
+  
+- user_items = @user.category_items
+- user_category_items = @user.user_category_items
+
+= admin_form_for @user do |f|
+  = f.text_field :username, label: 'Логин'
+  = f.email_field :email, label: 'Эл.почта'
+  = f.password_field :password, label: 'Пароль'
+  = f.password_field :password_confirmation, label: "Повторите пароль"
+  
+  - if current_user.is_main && @user != current_user
+    %h3.form-section Разрешённые категории:
+    .row.categories
+      .col-md-12
+        - Category.user_categories.each do |category|
+          %div{ class: 'col-md-' + (category.un == 'rooms' ? "2" : "3") }
+            %label
+              %strong= category.name
+            - category.category_items.actives.each_with_index do |item, idx|
+              = f.fields_for :user_category_items, (user_items.include?(item) ? user_category_items.select{ |i| i.category_item_id == item.id }.first : @user.user_category_items.build(category_item_id: item.id)) do |cf|
+                = cf.check_box :_destroy, { checked: !cf.object.new_record?, label: item.name || '---' }, 0, 1
+                = cf.hidden_field :category_item_id
+        .col-md-3
+          %label{ style: 'text-align: center;display: block' }
+            %strong Цена
+          .row= f.text_field :price_from, label: 'Цена от', label_class: 'col-md-4', field_class: 'col-md-8', prepend: '$'
+          .row= f.text_field :price_to, label: 'до', label_class: 'col-md-4', field_class: 'col-md-8', prepend: '$'
+      
+  = f.actions
+  - content_for :javascripts, f.validate

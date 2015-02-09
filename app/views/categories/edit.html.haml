@@ -1,0 +1,27 @@
+
+= admin_form_for @category, html: {class: "form-horizontal"} do |f|
+  
+  = f.text_field :name, label: 'Название', help_block: 'Введите название категории'
+  - unless @category.new_record?
+    = f.select :default_item_id, @category.category_items.selectables, { include_blank: '-', label: 'Вариант по умолчанию', help_block: 'Выберите из списка вариант категории по умолчанию', field_class: 'col-md-4' }
+  
+  %h3.form-section Варианты
+  .items
+    = f.fields_for :category_items do |cf|
+      = render 'category_item_fields', f: cf
+  .add= link_to_add_fields '<i class="fa-plus"></i> Добавить вариант'.html_safe, f, :category_items, '', {}, class: "btn btn-warning"
+      
+  = f.actions
+  - content_for :javascripts, f.validate
+
+- content_for :javascripts do
+  :javascript
+    $('#category_default_item_id').select2({ width: 200, minimumResultsForSearch: -1 });
+    $(".items").sortable({
+      handle: 'span.reorder',
+      update: function(event, ui) {
+        $(this).children('.fields').each(function(index){
+          $(this).find('input.item_weight').val(index + 1);
+        });
+      }
+    });

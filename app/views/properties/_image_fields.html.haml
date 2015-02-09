@@ -1,0 +1,4 @@
+.fields
+  = f.hidden_field :weight, class: 'item_weight'
+  .row= f.file_upload :image, name: "images[image][]", scale: 0.5, label: 'Фото', help_block: '', label_class: 'col-md-2', field_class: 'col-md-10', multiple: true
+  %hr/

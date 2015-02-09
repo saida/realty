@@ -1,0 +1,23 @@
+
+.col-md-12
+  .table-toolbar
+    .btn-group
+      %a.btn.btn-success{ :href => new_user_path }
+        Добавить новый
+        %i.fa-plus
+
+  %table#data-table
+
+- content_for :javascripts do
+  :javascript
+    var d = datatables('#data-table', '/users');
+    d.init({
+      aoColumns: [
+        {sTitle: "Логин", sWidth: "50%"},
+        {sTitle: "Еmail", sWidth: "50%"},
+        d.columns.actions({toggle: false, callback: function(row, button) {
+          return row[0] != 'admin';
+        }})
+      ]
+    });
+    $(function() { setTimeout(function(){ $('select').select2() }, 200) });

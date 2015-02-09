@@ -1,0 +1,45 @@
+
+<% create_default_user %>
+
+<h3 class="form-title">Логин</h3>
+
+<% if notice || alert %>
+	<div class="alert alert-error">
+		<button class="close" data-dismiss="alert"></button>
+		<span><%= notice || alert %></span>
+	</div>
+<% end %>
+
+<%= form_for resource, as: resource_name, url: user_session_path, html: {class: "login-form"} do |f| %>  
+  <%= hidden_field_tag(request_forgery_protection_token.to_s, form_authenticity_token) %>
+	<div class="form-group">
+		<label class="control-label visible-ie8 visible-ie9">Логин</label>
+		<div class="input-icon">
+			<i class="fa-user"></i>
+			<%= f.text_field :username, autocomplete: "off", placeholder: "Логин", class: "form-control placeholder-no-fix" %>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label visible-ie8 visible-ie9">Пароль</label>
+		<div class="input-icon">
+			<i class="fa-lock"></i>
+			<%= f.password_field :password, autocomplete: "off", placeholder: "Пароль", class: "form-control placeholder-no-fix" %>
+		</div>
+	</div>
+	<div class="form-actions">
+	  <label class="checkbox" for="user_remember_me">
+	    <%= f.check_box :remember_me %>
+	    запомнить
+	  </label>
+		<button type="submit" class="btn btn-info pull-right">Войти</button>
+	</div>
+<% end %>
+
+<% content_for :javascripts do %>
+  <script type="text/javascript">
+    $(function(){
+      $('input[type="checkbox"]').uniform();
+      setTimeout(function(){ $('#user_username, #user_password').attr('autocomplete', 'off'); }, 50);
+    });
+  </script>
+<% end %>

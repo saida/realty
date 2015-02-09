@@ -1,0 +1,17 @@
+h3.page-title, .breadcrumb {display: none}
+.col-md-8, .col-md-6 { padding-left: 5px; padding-right: 5px; }
+label.control-label { padding: 0 3px; }
+.form-group { margin-bottom: 10px; }
+div.dataTables_length label { float: right }
+/* #status {position: absolute; } */
+.btn-group#clean { float: right }
+label.inline { float: left }
+hr { margin: 10px 0 5px }
+.table thead tr th { font-size: 12px; vertical-align: middle }
+.yes, .no { margin-right: 7px }
+.form-horizontal .dates label.control-label { padding-bottom: 2px; padding-top: 2px; line-height: 1.2}
+.portlet > .portlet-title { padding-top: 3px; height: 23px }
+.portlet > .portlet-title > .caption { font-size: 14px }
+.page-sidebar-closed .sidebar-toggler:before { margin-top: 3px }
+#clean_sorting { float: right }
+#clean_sorting .btn { padding: 3px 10px; }

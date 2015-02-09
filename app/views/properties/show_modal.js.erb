@@ -1,0 +1,4 @@
+$('.modal-body').html("<%= escape_javascript render 'property' %>");
+$('#property_edit').unbind('click').click(function(){ var win = window.open('<%= edit_property_path(@property) %>'); win.focus(); return false; });
+
+$('#property_modal').modal('show');

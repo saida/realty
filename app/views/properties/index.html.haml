@@ -1,0 +1,322 @@
+= stylesheet_link_tag 'properties'
+  
+.col-md-12.properties
+  - category_items = current_user.is_main ? CategoryItem.actives : CategoryItem.actives.of_user(current_user)
+  .table-toolbar
+    .btn-group
+      %a.btn.btn-success{ href: new_property_path, target: '_blank' }
+        Добавить новую запись
+        %i.fa-plus
+    .btn-group#clean
+      %a.btn.btn-info{ href: '#' }
+        Очистить фильтр
+        %i.fa-eraser
+
+  .filter_fields.portlet
+    .portlet-title
+      .caption Поиск
+      .tools= link_to "", "#", class: 'collapse'
+    .portlet-body
+      = admin_form_tag '/properties', remote: true, class: 'form-horizontal', id: 'filter' do
+        .form-body
+          .row
+            - if @district
+              = select_tag "select_0", options_for_select(category_items.select{ |i| i.category_id == @district.id }.map{ |i| [i.name, i.id] }, !read_filter(0).nil? ? read_filter(0).split(',') : @district.default_item_id), { multiple: true, placeholder: @district.name, label: '', style: 'margin:0 0 10px 15px;', class: 'district', label_class: 'col-md-1', field_class: 'col-md-11' }
+          .row
+            - @categories.each_with_index do |category, index|
+              - selectables = category_items.select{ |i| i.category_id == category.id }.map{ |i| [i.name, i.id] }
+              - if ['rooms', 'floor', 'floors', 'status'].include?(category.un)
+                .col-md-3= admin_select_tag "select_#{index + 13}", options_for_select(selectables, !read_filter(index+13).nil? ? read_filter(index+13).split(',') : category.default_item_id), { multiple: true, placeholder: category.name, label: '', field_class: 'col-md-10' }
+              - else
+                .col-md-3= admin_select_tag "select_#{index + 13}", options_for_select(selectables.unshift(["- #{category.name} -", '']), !read_filter(index+13).nil? ? read_filter(index+13).split(',') : category.default_item_id), { placeholder: category.name, label: '', field_class: 'col-md-10' }
+          .row
+            .col-md-4{ style: 'margin-left:15px'}
+              .row= admin_text_field_tag "text_2", read_filter(2), placeholder: 'Ориентиры', label: '', label_class: 'inline', field_class: 'col-md-11 text'
+              .row= admin_text_field_tag "text_3", read_filter(3), placeholder: 'Дополнительная информация', label: '', label_class: 'inline', field_class: 'col-md-11 text' 
+              .row= admin_text_field_tag "text_4", read_filter(4), placeholder: 'Контакты', label: '', label_class: 'inline', field_class: 'col-md-11 text'
+              .row
+                = check_box_tag 'text_21', '', (read_filter(21) == '1' ? 1 : nil), label: ''
+                = label_tag 'text_21', 'с фото', class: 'control-label'
+                &nbsp; &nbsp;
+                = check_box_tag 'text_22', '', (read_filter(22) == '1' ? 1 : nil), label: ''
+                = label_tag 'text_22', 'без фото', class: 'control-label'
+        
+            .col-md-2{ style: 'width:18%'}
+              .row= admin_number_field_tag 'text_5', read_filter(5), placeholder: 'Цена от', label: '', label_class: 'inline', field_class: 'col-md-11 text', prepend: '$'
+              .row= admin_number_field_tag 'text_6', read_filter(6), placeholder: 'до',      label: '', label_class: 'inline', field_class: 'col-md-11 text', prepend: '$'
+              .row{ style: 'margin-bottom:12px' }
+                = check_box_tag 'text_1', '', (read_filter(1) == '1' ? 1 : nil), label: ''
+                = label_tag 'text_1', 'Помещение осмотрено', class: 'control-label'
+            .col-md-4.dates{ style: 'margin-left:15px;width:30%'}
+              .row
+                %label.control-label Дата последнего разговора
+                .input-group.input-large.date-picker.input-daterange.text
+                  = text_field_tag 'text_7', read_filter(7), class: 'form-control'
+                  %span.input-group-addon до
+                  = text_field_tag 'text_8', read_filter(8), class: 'form-control'
+              .row
+                %label.control-label Дата заявки
+                .input-group.input-large.date-picker.input-daterange.text
+                  = text_field_tag 'text_9', read_filter(9), class: 'form-control'
+                  %span.input-group-addon до
+                  = text_field_tag 'text_10', read_filter(10), class: 'form-control'
+              .row
+                %label.control-label Дата освобождения
+                .input-group.input-large.date-picker.input-daterange.text
+                  = text_field_tag 'text_11', read_filter(11), class: 'form-control'
+                  %span.input-group-addon до
+                  = text_field_tag 'text_12', read_filter(12), class: 'form-control'
+              
+  #status.btn-group
+    = submit_tag '-', 'data-id' => "status_null", class: "btn btn-default"
+    - category_items.select{ |i| i.category_id == @status.id }.each do |item|
+      = submit_tag item.name, 'data-id' => "status_#{item.id}", class: "btn btn-#{item.color}"
+    
+  .btn-group#clean_sorting
+    %a.btn.btn-info{ href: '#' }
+      Очистить сортировку
+      %i.fa-sort-amount-asc
+
+  %table#data-table
+
+.modal.fade#property_modal{ role: 'dialog', "aria-hidden" => true, 'aria-labelledby' => 'myModalLabel', tabindex: -1 }
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{ type: 'button', "data-dismiss" => 'modal', 'aria-hidden' => true} &times;
+        %h4.modal-title#myModalLabel Информация о помещении
+      .modal-body
+      .modal-footer
+        %button.btn.btn-primary#property_edit{ type: 'button', 'data-dismiss' => 'modal' } Изменить
+        %button.btn.btn-default{ type: 'button', "data-dismiss" => "modal" } Закрыть
+
+- content_for :javascripts do
+  :javascript
+    Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep) {
+      var n = this,
+          c = isNaN(decimals) ? 2 : Math.abs(decimals),
+          d = decimal_sep || '.',
+          t = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+          sign = (n < 0) ? '-' : '',
+          i = parseInt(n = Math.abs(n).toFixed(c)) + '',
+          j = ((j = i.length) > 3) ? j % 3 : 0;
+      return sign + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
+    };
+    
+    $.fn.dataTableExt.oApi.fnMultiFilter = function(oSettings, oData) {
+      for (var key in oData) {
+        if (oData.hasOwnProperty(key)) {
+          for (var i=0, iLen = oSettings.aoColumns.length; i < iLen; i++){
+            if (i == key){
+              /* Add single column filter */
+              oSettings.aoPreSearchCols[ i ].sSearch = oData[key];
+              break;
+            }
+          }
+        }
+      }
+      this.oApi._fnDraw( oSettings );
+    };
+    
+    $.fn.dataTableExt.oApi.fnSortNeutral = function(oSettings) {
+        /* Remove any current sorting */
+        oSettings.aaSorting = [ [8, 'asc'] ];
+        /* Sort display arrays so we get them in numerical order */
+        oSettings.aiDisplay.sort(function(x,y) {
+            return x-y;
+        });
+        oSettings.aiDisplayMaster.sort(function(x,y) {
+            return x-y;
+        });
+        oSettings.oApi._fnReDraw(oSettings);
+    };
+    
+    function filterTable() {
+      filterParams = {};
+      $('.filter_fields select').each(function(){
+        var item_id = $(this).val();
+        if (!item_id) item_id = '';
+        filterParams[parseInt($(this).attr('id').substr(7))] = item_id;
+      });
+      $('form#filter .text input[type="text"], form#filter input[type="number"]').each(function(){
+        var item_id = $(this).val();
+        if (!item_id) item_id = '';
+        filterParams[parseInt($(this).attr('id').substr(5))] = item_id;
+      });
+      filterParams[1] = $('input[name="text_1"]').first().is(':checked') ? 1 : 0;
+      filterParams[21] = $('input[name="text_21"]').first().is(':checked') ? 1 : '';
+      filterParams[22] = $('input[name="text_22"]').first().is(':checked') ? 1 : '';
+      
+      setTimeout(function(){ d.datatable.fnMultiFilter(filterParams); }, 500);
+    }
+  
+    var d = datatables('#data-table', '/properties?contact_id=#{ params[:contact_id] }');
+    d.init({
+      aaSorting: [ [8, 'asc'] ],
+      sDom: 'iltrip',
+      sServerMethod: "PUT",
+      fnInitComplete: filterTable,
+      rowCallback: function(nRow, aData, iDisplayIndex) {
+        $('input[type="checkbox"]', nRow).uniform().on('change', function() {
+          $(nRow).toggleClass('active', $(this).is(':checked'));
+        });
+      },
+      aoColumns: [
+        {sTitle: '<input class="group-checkable" type="checkbox" data-set=".checkboxes" />',
+          sWidth: 10, bSortable: false,
+          mRender: function(data, type, row) {
+            return '<input type="checkbox" class="checkboxes" name="property_id[]" value="' + row.id + '" />';
+          }
+        },
+        {sTitle: 'Цена', sWidth: 20, sClass: 'center', iDataSort: [0, 12, 13], mRender: function(data, type, row){
+          var prices = [];
+          $(data).each(function(i, n){
+            if (n !== '' && n != null && n !== 'undefined')
+                prices.push('$' + n.toMoney(0));
+          });
+          return prices.join(', ');
+        }},
+        {sTitle: 'к/э/э', sWidth: 50, sClass: 'center', bSortable: false, mRender: function(data, type, row){
+          var kee = [];
+          $(data).each(function(i, k){
+            if (k !== '' && k != null && k !== 'undefined')
+              kee.push(k.match(/\d+/) ? k.match(/\d+/)[0] : k);
+            else
+              kee.push('-');
+          });
+          return kee.join('/');
+        }},
+        {sTitle: "Ориентиры", sWidth: 100, iDataSort: 2, mRender: function(data, type, row){
+          return data ? ('<a href="/properties/' + row.id + '/show_modal" data-remote="true">' + data + '</a>') : '';
+        }},
+        {sTitle: 'Доп. инфо', sWidth: 20, iDataSort: 3 },
+        {sTitle: 'Фото', bSortable: false, sWidth: 40, mRender: function(data, type, row){
+          var imgs = '<div style="width:65px">';
+          for (i = 0; i < data.length; i++) {
+            imgs += '<a href="'+ data[i] +'" target="_blank"><img src="' + data[i] + '" width="30" style="margin-right: ' + (i%2 == 0 ? 5 : 0) + 'px; margin-bottom: 5px; max-height:30px; float: left;"></a>';
+          }
+          imgs += '</div>';
+          return imgs;
+        }},
+        {sTitle: 'Статус', sWidth: 10, sClass: 'center', bSortable: false},
+        {sTitle: 'Контакты', sWidth: 100, bSortable: false },
+        {sTitle: 'Освобождено', sWidth: 10, sClass: 'center', iDataSort: 6, mRender: function(data, type, row){
+          if (data == null) {
+            return '';
+          }
+          return data;
+        }},
+        {sTitle: 'Дата заявки', sWidth: 10, sClass: 'center', iDataSort: 7 },
+        {sTitle: 'Дата общения', sWidth: 10, sClass: 'center', iDataSort: 8 },
+        {sTitle: 'Осмотрено', sWidth: 4, sClass: 'center', bSortable: false, mRender: function(data, type, row){
+          if (data == null) {
+            return '<a class="viewed yes" href="/properties/' + row.id + '/toggle_viewed?n=1" data-remote="true">Да</a><a class="viewed no" href="/properties/' + row.id + '/toggle_viewed?n=0" data-remote="true">Нет</a><span class="label label-sm label-default">--</span>';
+          } else if (data == true) {
+            return '<span class="label label-sm label-success yes">Да</span><a class="viewed no" href="/properties/' + row.id + '/toggle_viewed?n=0" data-remote="true">Нет</a><a class="viewed" href="/properties/' + row.id + '/toggle_viewed?n=2" data-remote="true">--</a>';
+          } else {
+            return '<a class="viewed yes" href="/properties/' + row.id + '/toggle_viewed?n=1" data-remote="true">Да</a><span class="label label-sm label-danger no">Нет</span><a class="viewed" href="/properties/' + row.id + '/toggle_viewed?n=2" data-remote="true">--</a>';
+          }
+        }},
+        {bVisible: false},{bVisible: false},{bVisible: false},{bVisible: false},{bVisible: false},
+        {bVisible: false},{bVisible: false},{bVisible: false},{bVisible: false},{bVisible: false},{bVisible: false},
+        d.columns.actions({ toggle: false })
+      ]
+    });
+    $('input[type=checkbox]', d.datatable).uniform();
+    $('input[name="text_1"]').uniform();
+    $('#status input').click(function(){
+      $.ajax({
+          url: "/properties/update_statuses?status=" + $(this).attr('data-id').substr(7),
+          method: 'post', 
+          data: $('#data-table input.checkboxes').serialize(), 
+          async: false
+      }).success(function(res) {
+        console.log(res);
+        d.datatable.fnDraw();
+      }).fail(function(xhr) {
+        console.log(xhr);
+      });
+    });
+        
+    $(function(){
+      
+      $(document.body).on('ajax:success', 'a.viewed', function(){
+        var $link = $(this),
+            href = $link.attr('href'),
+            html = '';
+        index = href.indexOf('?');
+        if (index != -1) href = href.substring(0, index);
+        if ($link.html() == '--') {
+          html = '<a class="viewed yes" href="' + href + '?n=1" data-remote="true">Да</a><a class="viewed no" href="' + href + '?n=0" data-remote="true">Нет</a><span class="label label-sm label-default">--</span>';
+        } else if ($link.html() == 'Да') {
+          html = '<span class="label label-sm label-success yes">Да</span><a class="viewed no" href="' + href + '?n=0" data-remote="true">Нет</a><a class="viewed" href="' + href + '?n=2" data-remote="true">--</a>';
+        } else {
+          html = '<a class="viewed yes" href="' + href + '?n=1" data-remote="true">Да</a><span class="label label-sm label-danger no">Нет</span><a class="viewed" href="' + href + '?n=2" data-remote="true">--</a>';
+        }
+        $link.parent().html(html);
+      });
+      
+      // Filter fields
+      $('.filter_fields select').each(function(){
+        $(this).select2({ width: $(this).hasClass('district') ? '97%' : 200 }).on('change', function(){
+          var item_id = $(this).val();
+          if (!item_id) item_id = '';
+          
+          d.datatable.fnFilter(item_id, parseInt($(this).attr('id').substr(7)));
+        });
+      });
+      
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout(timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+      
+      // Catch text change and update data table
+      $('form#filter .text input[type="text"], form#filter .text input[type="number"]').each(function(){
+        $(this).on('keyup paste', function(){
+          delay(filterTable, 1000);
+        });
+      });
+      
+      $('input[name="text_1"]').on('change', function(){
+        d.datatable.fnFilter(($(this).is(':checked') ? 1 : 0), 1);
+      });
+      
+      $('input[name="text_21"], input[name="text_22"]').on('change', function(){
+        d.datatable.fnFilter(($(this).is(':checked') ? 1 : ''), parseInt($(this).attr('name').replace('text_', '')));
+      });
+      
+      // Data table Checkboxes
+      $('.group-checkable').change(function() {
+          var set = jQuery(this).attr("data-set");
+          var checked = jQuery(this).is(":checked");
+          jQuery(set).each(function () {
+              if (checked) {
+                  $(this).attr("checked", true);
+              } else {
+                  $(this).attr("checked", false);
+              }
+              $(this).parents('tr').toggleClass("active", $(this).is(':checked'));
+          });
+          $.uniform.update(set);
+      });
+      
+      // Clear filter
+      $('.btn-group#clean a').on('click', function(){
+        $('form#filter input[type="text"], input[type="number"], form#filter select').val('');
+        $('form#filter select').select2('val', '');
+        $('form#filter input[type="checkbox"]').attr('checked', false);
+        $.uniform.update('form#filter input[type="checkbox"]');
+        d.datatable.fnFilterClear();
+        return false;
+      });
+      
+      // Clear custom sorting
+      $('.btn-group#clean_sorting a').on('click', function(){
+        d.datatable.fnSortNeutral();
+        return false;
+      });
+    });

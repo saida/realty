@@ -1,0 +1,141 @@
+<% menu = menu_builder %>
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ru" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ru" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ru" class="no-js"> <!--<![endif]-->
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <title><%= @page_title %></title>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+   <meta name="MobileOptimized" content="320">
+   <link href="/admin/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+   <link href="/admin/dist/admin.min.css" rel="stylesheet" type="text/css" />
+   <link href="/admin/main.css" rel="stylesheet" type="text/css" />
+   <link href="/admin/assets/fonts/font.css" rel="stylesheet" type="text/css" />
+   <%= csrf_meta_tag %>
+</head>
+<body>
+  <!-- BEGIN HEADER -->
+  <div class="header navbar navbar-inverse navbar-static-top">
+    <!-- BEGIN TOP NAVIGATION BAR -->
+    <div class="header-inner">
+      <!-- BEGIN LOGO -->  
+      <a class="navbar-brand" href="/admin"></a>
+      <!-- END LOGO -->
+      <!-- BEGIN TOP NAVIGATION MENU -->
+      <ul class="nav navbar-nav pull-right">
+        <li class="devider">&nbsp;</li>
+        <!-- BEGIN USER LOGIN DROPDOWN -->
+        <li class="dropdown user">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+            <!--img alt="" src="/assets/img/avatar3_small.jpg" style='opacity:0'/-->
+            <span class="username"><Admin><%= current_user.username %></span>
+            <i class="fa-angle-down"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="<%= edit_user_path(current_user) %>"><i class="fa-user"></i> Аккаунт</a></li>
+            <li class="divider"></li>
+            <li><a href="/logout" data-method="delete"><i class="fa-key"></i> Выйти</a></li>
+          </ul>
+        </li>
+        <!-- END USER LOGIN DROPDOWN -->
+      </ul>
+      <!-- END TOP NAVIGATION MENU -->
+    </div>
+    <!-- END TOP NAVIGATION BAR -->
+  </div>
+  <!-- END HEADER -->
+  <div class="clearfix"></div>
+
+  <!-- BEGIN CONTAINER -->
+  <div class="page-container">
+    <!-- BEGIN SIDEBAR -->
+    <div class="page-sidebar navbar-collapse collapse">
+      <!-- BEGIN SIDEBAR MENU -->        
+      <ul class="page-sidebar-menu">
+        <li>
+          <form class="search-form search-form-sidebar" role="form">
+            <div class="input-icon right">
+              <i class="fa-search"></i>
+              <input type="text" class="form-control input-medium input-sm" placeholder="Search...">
+            </div>
+          </form>
+        </li>
+        <li>
+          <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+          <div class="sidebar-toggler"></div>
+          <div class="clearfix"></div>
+          <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+        </li>
+        <%= menu %>
+      </ul>
+      <!-- END SIDEBAR MENU -->
+    </div>
+    <!-- END SIDEBAR -->
+    <!-- BEGIN PAGE -->
+    <div class="page-content">
+      <!-- BEGIN PAGE HEADER-->
+      <div class="row">
+        <div class="col-md-12">
+          <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+          <h3 class="page-title">
+            <%= @title %>
+            <% if @title_small %>
+              <small><%= @title_small %></small>
+            <% end %>
+          </h3>
+          <ul class="page-breadcrumb breadcrumb">
+            <%= breadcrumbs %>
+          </ul>
+          <!-- END PAGE TITLE & BREADCRUMB-->
+          <% if flash[:notice] %>
+            <div class="alert alert-success">
+              <%= flash[:notice] %>
+            </div>
+          <% end %>
+          <% if flash[:error] %>
+            <div class="alert alert-danger">
+              <%= flash[:error] %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <!-- END PAGE HEADER-->
+
+      <!-- BEGIN PAGE CONTENT-->
+      <div class="row">
+        <%= yield %>
+      </div>
+      <!-- END PAGE CONTENT-->
+    </div>
+    <!-- BEGIN PAGE -->
+
+    <div class="footer">
+      <div class="footer-inner">
+      </div>
+      <div class="footer-tools">
+        <span class="go-top">
+        <i class="fa-angle-up"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+  <!-- END CONTAINER -->
+
+  <!--[if lt IE 9]>
+  <%= javascript_include_tag "/admin/assets/plugins/respond.min" %>
+  <%= javascript_include_tag "/admin/assets/plugins/excanvas.min" %>
+  <![endif]-->
+  <%= javascript_include_tag "application" %>
+  <script>window.CKEDITOR_BASEPATH = "/admin/ckeditor/";</script>
+  <%= javascript_include_tag "/admin/dist/admin.min" %>
+  <script>App.init();</script>
+  <!-- Locales -->
+  <%= javascript_include_tag '/admin/assets/plugins/jquery-validation/localization/messages_ru' %>
+  <%= javascript_include_tag '/admin/assets/plugins/select2/select2_locale_ru' %>
+  <%= javascript_include_tag "/admin/main" %>
+
+  <%= yield :javascripts %>
+</body>
+</html>

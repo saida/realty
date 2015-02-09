@@ -1,0 +1,25 @@
+.col-md-7
+
+  .table-toolbar
+    .btn-group
+      %a.btn.btn-success{ :href => new_category_path }
+        Добавить новую категорию
+        %i.fa-plus
+
+  %table#data-table
+
+- content_for :javascripts do
+  :javascript
+    var d = datatables('#data-table', '/categories');
+    d.init({
+      reordering: true,
+      aoColumns: [
+        {sTitle: "Категории (кол. вариантов)", mRender: function(data, type, row){
+          return data + " (" + row[2] + ")";
+        }},
+        d.columns.actions({ callback: function(row, button) {
+          return button != 'trash' || row[4] == null;
+        }
+        })
+      ]
+    });

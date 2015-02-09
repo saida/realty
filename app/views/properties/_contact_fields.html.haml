@@ -1,0 +1,2 @@
+= admin_fields_for :contact, @contact do |cf|
+  = cf.text_area :info, label: '&nbsp;'.html_safe, placeholder: '', rows: 2, label_class: 'col-md-2', field_class: 'col-md-6', help_block: '<span class="error contact">Контакт не может быть пустым</span>'.html_safe

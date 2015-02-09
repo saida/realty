@@ -1,0 +1,150 @@
+:css
+  ul.images { list-style: none; }
+  ul.images li { display: inline-block; margin:0 15px 15px 0 }
+  .form-horizontal label.control-label { padding-bottom: 2px; padding-top: 2px; line-height: 1.2}
+  .price input[type="text"] { width: 150px !important }
+  .fileupload-preview img { max-width: 100% }
+  ul.images li { position: relative; }
+  ul.images li .btn {position:absolute; top: 0; right: 0; z-index:1000; border-radius: 0 !important; }
+  ul.images a.btn {opacity: 0; color: white; border: 0; }
+  ul.images li:hover a {opacity: 1;}
+  .error { display: none; color: #e02222; }
+  
+%a{ name: 'top' }
+= admin_form_for @property, html: {class: "form-horizontal"} do |f|
+  - @property.errors.full_messages.each do |msg|
+    %p{ style: "color:#e02222" }= msg
+    
+  - Category.actives.each do |category|
+    - if ['district', 'service_type'].include?(category.un)
+      - if @property.new_record?
+        - items = []
+      - else
+        - items = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item)
+      - (3 - items.size).times { items << @property.property_category_items.build }
+      .row
+        - items.each_with_index do |item, index|
+          = f.admin_fields_for :property_category_items, item do |pf|
+            %div{ class: "col-md-#{ index == 0 ? 4 : 2 }", style: index != 2 ? 'margin-right:70px' : nil }
+              = pf.select :category_item_id, category.category_items.selectables, { selected: (@property.new_record? ? (index == 0 ? category.default_item_id : nil) : item.category_item_id), include_blank: '-', label: (index == 0 ? category.name + (category.un == 'service_type' ? ' <span class="required">*</span>' : '') : '').html_safe, field_class: (index == 0 ? "col-md-6" : nil), label_class: (index == 0 ? "col-md-6" : nil), help_block: (category.un == 'service_type' && index == 0 ? '<span class="error">Это поле необходимо заполнить.</span>'.html_safe : nil) }
+            
+      - if category.un == 'service_type'
+        .row
+          .col-md-4{ style: 'margin-right:70px'}= f.number_field :price1, label: 'Цена <span class="required">*</span>'.html_safe, placeholder: '', field_class: 'col-md-6 price', label_class: 'col-md-6', prepend: '$', help_block: '<span class="error price">Это поле необходимо заполнить.</span>'.html_safe
+          .col-md-2{ style: 'margin-right:70px'}= f.number_field :price2, label: '', field_class: 'col-md-12 price', prepend: '$'
+          .col-md-2{ style: 'margin-right:70px'}= f.number_field :price3, label: '', field_class: 'col-md-12 price', prepend: '$'
+
+    - else
+      - item = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item).first || @property.property_category_items.build
+      = f.admin_fields_for :property_category_items, item do |pf|
+        - c_item = @property.category_items.find_by_category_id(category.id)
+        = pf.select :category_item_id, category.category_items.selectables, { selected: (@property.new_record? ? category.default_item_id : (c_item ? c_item.id : nil)), include_blank: '-', label: (category.name + (['rooms', 'floor', 'floors', 'property_type'].include?(category.un) ? ' <span class="required">*</span>' : "")).html_safe, help_block: ['rooms', 'floor', 'floors', 'property_type'].include?(category.un) ? '<span class="error required">Это поле необходимо заполнить.</span>'.html_safe : nil }
+
+    - if category.un == 'district'
+      = f.text_area :landmark, label: 'Ориентиры <span class="required">*</span>'.html_safe, placeholder: '', help_block: '<span class="error">Это поле необходимо заполнить.</span>'.html_safe, rows: 3
+  
+  = f.text_area :more_info, label: 'Доп. инфо', rows: 4, help_block: 'Дополнительная информация об объекте (мебель, техника, расположение и т.п.)'
+  
+  %h3.form-section
+    Фотографии
+    - if @images.present? && entered_from_the_main_comp
+      %span{ style: "font-size: 16px; margin-left: 15px" }= link_to "Открыть папку", open_directory_property_path(@property), remote: true
+  - if @images.present?
+    %ul.images
+      - @images.each do |image|
+        %li{ id: "image_#{image.id}" }
+          %a.btn.btn-success.btn-xs{ href: url_for(action: :delete_image, id: @property.id, image_id: image.id), "data-remote" => true, "data-toggle" => 'modal', "data-confirm" => 'Are you sure?', "title" => 'Remove' }
+            %span.fa-times
+          = link_to (image_tag URI.decode(image.image.url), height: 150), URI.decode(image.image.url), target: '_blank'
+    .row
+      .col-md-1
+      .col-md-10
+        %em Перетащите фотографии для изменения порядка. Нажмите на фото для полного изоброжения (откроется в новую окошку).
+    %hr/
+    
+  .items
+    = f.admin_fields_for :images, [] do |pf|
+      = render 'image_fields', f: pf
+  .add= link_to_add_fields '<i class="fa-plus"></i> Добавить фото'.html_safe, f, :images, '', {}, class: "btn btn-warning"
+    
+  %h3.form-section Контакты
+  
+  = f.select :contact_id, Contact.selectables, { include_blank: '-', label: 'Контакт <span class="required">*</span>'.html_safe, help_block: 'Выберите контакта из списка или добавьте новый' }
+  
+  .new_contact= render 'contact_fields'
+  
+  %hr/
+  .row
+    .col-md-4{ style: "margin-right: 90px"}= f.date_field :request_date,   label: "Дата заявки", value: Russian.l(@property.request_date || Date.today), label_class: 'col-md-6', field_class: 'col-md-6', help_block: 'Дата заявки'
+    .col-md-6= f.date_field :rental_date,    label: "Дата сдачи",  value: @property.rental_date? ? Russian.l(@property.rental_date) : nil,  label_class: 'col-md-4', field_class: 'col-md-6', help_block: 'Дата сдачи помещения'
+    
+  .row
+    .col-md-4{ style: "margin-right: 90px"}= f.date_field :last_call_date, label: "Дата общения", value: @property.last_call_date? ? Russian.l(@property.last_call_date) : nil, label_class: 'col-md-6', field_class: 'col-md-6', help_block: 'Дата последнего общения'
+    .col-md-6= f.date_field :clear_date,     label: "Дата освобождения", value: @property.clear_date? ? Russian.l(@property.clear_date) : nil, label_class: 'col-md-4', field_class: 'col-md-6', help_block: 'Дата освобождения помещения'
+    
+  %hr/
+  
+  .col-md-2
+  = f.check_box :viewed, label: "Помещение осмотрено"
+  
+  = f.actions
+  - content_for :javascripts, f.validate
+
+- content_for :javascripts do
+  :javascript
+    var checked = 0;
+    
+    $('select').each(function(){
+      $(this).select2({ width: 200 });
+    });
+    $('#property_contact_id').select2({ 
+        width: 300,
+        minimumInputLength: 2
+    }).on('change', function(e){
+      $.post('#{ update_contact_properties_path }', { contact_id: e.val });
+    });
+    
+    $('.form-horizontal').submit(function(){
+      var valid = true;
+      $('.error').each(function(){
+        var error_div = $(this);
+        
+        if (error_div.hasClass('contact')) {
+          if (!$('#property_contact_id').val().length && !$('#contact_info').val().length) {
+            error_div.show();
+            valid = false;
+          } else {
+            error_div.hide();
+          }
+        } else {
+          if (error_div.hasClass('price')) {
+            var inputs = error_div.parent('.help-block').prev().find('input');
+          } else {
+            var inputs = error_div.parent('.help-block').prev();
+          }
+          inputs.each(function(){
+            if (!$(this).val().length) {
+              error_div.show();
+              valid = false;
+            } else {
+              error_div.hide();
+            }
+          });
+        }
+      });
+      if (!valid) {
+        window.location.hash = "";
+        window.location.hash = "#top";
+      }
+      checked++;
+      
+      return valid || checked > 1;
+    });
+    
+  - if @images.present?
+    :javascript
+      $('ul.images').sortable({
+        update: function(){
+          $.post("#{ url_for action: :sort_images, id: @property.id }", $(this).sortable('serialize'));
+        }
+      });

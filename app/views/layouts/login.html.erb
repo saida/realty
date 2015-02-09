@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!--> <html lang="ru" class="no-js"> <!--<![endif]-->
+<!-- BEGIN HEAD -->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Login</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<meta content="" name="description" />
+	<meta content="" name="author" />
+	<meta name="MobileOptimized" content="320">
+	<!-- BEGIN GLOBAL MANDATORY STYLES -->
+  <link href="/admin/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+	<link href="/admin/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css"/>
+	<!-- END GLOBAL MANDATORY STYLES -->
+	<!-- BEGIN PAGE LEVEL STYLES --> 
+	<!--link rel="stylesheet" type="text/css" href="/admin/assets/plugins/select2/select2_conquer.css" /-->
+	<!-- END PAGE LEVEL SCRIPTS -->
+	<!-- BEGIN THEME STYLES --> 
+	<link href="/admin/assets/css/style-conquer.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/css/style.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/css/style-responsive.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/css/plugins.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/css/themes/default.css" rel="stylesheet" type="text/css" id="style_color"/>
+	<link href="/admin/assets/css/pages/login.css" rel="stylesheet" type="text/css"/>
+	<link href="/admin/assets/css/custom.css" rel="stylesheet" type="text/css"/>
+	<%= csrf_meta_tag %>
+</head>
+<body class="login">
+	<div class="logo">
+		<!--img src="/assets/img/logo.png" alt="" /-->
+	</div>
+	<div class="content">
+	  <%= yield %>
+	</div>
+	<div class="copyright">
+		<%= Time.now.year %>
+		&copy;
+	</div>
+	
+	<%= javascript_include_tag "application" %>
+	<%= javascript_include_tag "/admin/dist/admin.min" %>
+  <script>App.init();</script>
+	<%= javascript_include_tag "/admin/main" %>
+  <%= yield :javascripts %>
+</body>
+</html>

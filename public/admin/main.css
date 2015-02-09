@@ -1,0 +1,30 @@
+body { font-size: 12px; line-height: 1 }
+.center {text-align: center;}
+.align-right {text-align: right;}
+
+.form-actions {border-radius: 0 0 6px 6px;}
+
+.col-md-9 { width: 78%; }
+
+span.del {margin: 8px 0 0 5px; }
+span.del a span.fa { color: #f40000; font-size: 20px !important; }
+.add { margin-left: 17% }
+span.add a { color: #414247; }
+.reorder { cursor: move; }
+.page-sidebar { width: 170px }
+.page-content { margin-left: 170px }
+.form-control { height: 25px; font-size: 12px }
+
+.select2-results li { padding: 2px 0}
+.select2-container .select2-choice { height: 25px; line-height: 25px; }
+.select2-container .select2-choice > .select2-chosen { margin-top: -3px }
+span.label { padding: 0 10px }
+.select2-container-multi .select2-choices .select2-search-field input { min-height: 16px; line-height: 16px }
+.select2-container .select2-choice .select2-arrow b { background-position: 0 -1px; }
+.select2-search input { padding: 3px !important }
+.btn { font-size: 12px; padding: 3px 10px }
+.btn-xs { padding: 2px 4px }
+label { font-size: 12px }
+.input-group-addon { font-size: 12px; padding: 3px 5px }
+table td, table th { vertical-align: middle !important }
+input.form-control { padding: 0 5px !important }

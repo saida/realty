@@ -1,0 +1,30 @@
+.fields
+  .row
+    = f.hidden_field :weight, class: 'item_weight'
+    - if @category.un == 'status'
+      = f.text_field :name, placeholder: "Вариант", label: '<span class="reorder fa-sort"></span>'.html_safe, style: 'width:350px;float:left;display:inline-block;', field_class: 'col-md-6', label_class: 'col-md-2' do
+        %span.del.col-md-1{ style: 'float:right'}= link_to_remove_fields '<span class="fa fa-times"></span>'.html_safe, f, "Вы уверены?"
+        = f.select :color, ['default', 'primary', 'success', 'info', 'warning', 'danger'], placeholder: "Цвет", label: '', field_class: 'col-md-2', style: 'float:right', id: "select_#{f.object.id}"
+    - else
+      = f.text_field :name, placeholder: "Вариант", label: '<span class="reorder fa-sort"></span>'.html_safe, style: 'width:350px;float:left;display:inline-block;', field_class: 'col-md-6', label_class: 'col-md-2' do
+        %span.del.col-md-1= link_to_remove_fields '<span class="fa fa-times"></span>'.html_safe, f, "Вы уверены?"
+
+- content_for :javascripts do
+  :javascript
+    function format(color) {
+      if (!color.id) return color.text;
+      return '<span class="label label-' + color.text + '" style="margin-top: 3px;line-height: 10px; height:10px">&nbsp;&nbsp;&nbsp;</span>';
+    }
+    
+    $('select').select2({
+      width: 80,
+      placeholder: "Цвет",
+      formatResult: format,
+      formatSelection: format,
+      minimumResultsForSearch: -1,
+      escapeMarkup: function(m) {
+        return m;
+      }
+    });
+    
+    

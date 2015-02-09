@@ -1,0 +1,25 @@
+.col-md-12
+
+  .table-toolbar
+    .btn-group
+      %a.btn.btn-success{ href: new_contact_path }
+        Добавить новый контакт
+        %i.fa-plus
+
+  %table#data-table
+
+- content_for :javascripts do
+  :javascript
+    var d = datatables('#data-table', '/contacts');
+    d.init({
+      aoColumns: [
+        {sTitle: 'Контакты'},
+        {sTitle: 'Объекты', sClass: 'center', bSortable: false, mRender: function(data, type, row){
+          return d.button({ url: '/contacts/' + row.id + '/properties', text: 'Объекты (' + data + ')', icon: 'fa-angle-right' });
+        }},
+        d.columns.actions({ toggle: false })
+      ]
+    });
+    $(function(){
+      setTimeout(function(){ $('select').select2(); }, 200);
+    });
