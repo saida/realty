@@ -1,6 +1,6 @@
 sqlite: &sqlite
   adapter: sqlite3
-  database: db/realty
+  database: db/<%= Rails.env %>.sqlite3
 
 mysql: &mysql
   adapter: mysql2
@@ -24,8 +24,6 @@ defaults: &defaults
   pool: 5
   timeout: 5000
   encoding: utf8
-  username: root
-  password: root
   <<: *<%= ENV['RAILS_DB'] || "sqlite" %>
 
 development:
