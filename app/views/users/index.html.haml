@@ -16,7 +16,7 @@
         {sTitle: "Логин", sWidth: "50%"},
         {sTitle: "Еmail", sWidth: "50%"},
         d.columns.actions({toggle: false, callback: function(row, button) {
-          return row[0] != 'admin';
+          return row[0] != 'admin' || button != 'trash';
         }})
       ]
     });
