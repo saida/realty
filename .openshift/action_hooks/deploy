@@ -5,6 +5,7 @@
 # ruby, etc.
 
 STORED_ASSETS="${OPENSHIFT_DATA_DIR}/assets" LIVE_ASSETS="${OPENSHIFT_REPO_DIR}/public/attachments"
+STORED_DB="${OPENSHIFT_DATA_DIR}/db" LIVE_DB="${OPENSHIFT_REPO_DIR}/db"
 
 # Ensure our stored assets directory exists
 if [ ! -d "${STORED_ASSETS}" ]; then
@@ -18,4 +19,18 @@ echo " WARNING: Assets included in git repository, not using stored assets"
 else
 echo " Restoring stored assets"
 ln -sf "${STORED_ASSETS}" "${LIVE_ASSETS}"
+fi
+
+# Ensure our stored db directory exists
+if [ ! -d "${STORED_DB}" ]; then
+echo " Creating permanent db directory"
+mkdir "${STORED_DB}"
+fi
+
+# Create symlink to stored assets unless we're uploading our own assets
+if [ -d "${LIVE_DB}" ]; then
+echo " WARNING: DB included in git repository, not using stored db"
+else
+echo " Restoring stored db"
+ln -sf "${STORED_DB}/realty" "${LIVE_DB}/realty"
 fi
