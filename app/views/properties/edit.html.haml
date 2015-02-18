@@ -52,10 +52,11 @@
   - if @images.present?
     %ul.images
       - @images.each do |image|
-        %li{ id: "image_#{image.id}" }
-          %a.btn.btn-success.btn-xs{ href: url_for(action: :delete_image, id: @property.id, image_id: image.id), "data-remote" => true, "data-toggle" => 'modal', "data-confirm" => 'Are you sure?', "title" => 'Remove' }
-            %span.fa-times
-          = link_to (image_tag URI.decode(image.image.url), height: 150), URI.decode(image.image.url), target: '_blank'
+        - if image.image? && image.image.exists?
+          %li{ id: "image_#{image.id}" }
+            %a.btn.btn-success.btn-xs{ href: url_for(action: :delete_image, id: @property.id, image_id: image.id), "data-remote" => true, "data-toggle" => 'modal', "data-confirm" => 'Are you sure?', "title" => 'Remove' }
+              %span.fa-times
+            = link_to (image_tag URI.decode(image.image.url), height: 150), URI.decode(image.image.url), target: '_blank'
     .row
       .col-md-1
       .col-md-10

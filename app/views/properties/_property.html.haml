@@ -38,7 +38,8 @@
     %h4.form-section Фотографии
     %ul.images
       - @images.each do |image|
-        %li= link_to (image_tag image.image.url), image.image.url(:original), target: '_blank'
+        - if image.image? && image.image.exists?
+          %li= link_to (image_tag image.image.url), image.image.url(:original), target: '_blank'
 
   %br/
   - contact = @property.contact

@@ -11,7 +11,7 @@ class PropertiesController < ApplicationController
         [row.rooms, row.floor, row.floors],
         row.address,
         row.more_info,
-        row.images.map{ |i| i.image.url },
+        row.images.map{ |i| i.image? ? i.image.url : nil }.reject(&:blank?),
         row.state,
         row.contact_info,
         (row.clear_date? ? row.clear_date.strftime('%d.%m.%Y') + (row.clear_date >= Date.today && row.clear_date - 1.month <= Date.today ? '<br/><span class="label label-success">освобождается</span>' : '') : nil),

@@ -53,7 +53,7 @@ class Property < ActiveRecord::Base
     end
     
     Property.where(id: id).update_all(rooms: r, floor: f, floors: fs, address: a, state: s)
-    
+=begin    
     images.each do |image|
       if image.image?
         path = image.image.path
@@ -81,6 +81,7 @@ class Property < ActiveRecord::Base
         end
       end
     end
+=end
   end
   
   def self.update_local_values
