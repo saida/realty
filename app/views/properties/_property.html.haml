@@ -42,11 +42,11 @@
           %li= link_to (image_tag image.image.url), image.image.url(:original), target: '_blank'
 
   %br/
-  - contact = @property.contact
-  .row
-    %label.col-md-3 Контакты
-    %label.col-md-5= contact.info
-    %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", contact_properties_path(contact), target: "_blank"
+  - if contact = @property.contact
+    .row
+      %label.col-md-3 Контакты
+      %label.col-md-5= contact.info
+      %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", contact_properties_path(contact), target: "_blank"
     
   %hr/
   .row
