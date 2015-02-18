@@ -1,5 +1,4 @@
-# source 'https://rubygems.org'
-source 'http://mirror1.prod.rhcloud.com/mirror/ruby/'
+source 'https://rubygems.org'
 
 gem 'rails', '4.0.2'
 gem 'sqlite3'
