@@ -15,3 +15,5 @@ hr { margin: 10px 0 5px }
 .page-sidebar-closed .sidebar-toggler:before { margin-top: 3px }
 #clean_sorting { float: right }
 #clean_sorting .btn { padding: 3px 10px; }
+#data-table .underline a { text-decoration: underline; font-weight: bold; }
+#data-table .underline a:hover { text-decoration: none; }

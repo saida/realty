@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   #protect_from_forgery with: :exception
   
+  rescue_from ActiveRecord::RecordNotFound, with: :render_missing
+  
   before_filter :authenticate_user!
   before_filter :identify_allowed_properties
 
@@ -16,5 +18,9 @@ class ApplicationController < ActionController::Base
   
   def properties_list
     @user_properties_list
+  end
+  
+  def render_missing
+    render text: "<div class=\"col-md-12\"><h2>Страница не найдена!</h2><br/><p>Такая страница не существует. Возможно, вы ошиблись в наборе ссылки или забыли пройти авторизацию.</p><p>Вы всегда можете вернуться на <a href=\"/\">главную страницу</a>.</p></div>", status: 404, layout: "application"
   end
 end

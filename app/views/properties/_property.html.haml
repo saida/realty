@@ -1,6 +1,7 @@
 :css
   .modal-body ul.images { list-style: none; }
-  .modal-body ul.images li { display: inline-block; margin:0 20px 20px 0 }
+  .modal-body ul.images li { display: inline-block; margin: 0 1% 20px; max-width: 22.5%; vertical-align: top }
+  .modal-body ul.images li img { max-width: 100%; display: block; }
   .modal-body label { padding-top: 5px}
   .modal-body label.col-md-3, label.col-md-4, label.col-md-6 { text-align: right; padding-left: 0 }
   .modal-body label.col-md-2, .modal-body label.col-md-5 { padding-left: 0 }
@@ -23,7 +24,7 @@
       - item = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item).first || @property.property_category_items.build
       .row
         %label.col-md-3= category.name
-        %label= @property.item(category.un)
+        %label= @property.item(category.un || category.id)
 
     - if category.un == 'district'
       .row
@@ -46,7 +47,7 @@
     .row
       %label.col-md-3 Контакты
       %label.col-md-5= contact.info
-      %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", contact_properties_path(contact), target: "_blank"
+      %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", properties_path(contact_id: contact), target: "_blank"
     
   %hr/
   .row
@@ -64,3 +65,5 @@
   .row
     %label.col-md-3 Осмотрено
     %label= @property.viewed ? 'Да' : 'Нет'
+    
+    

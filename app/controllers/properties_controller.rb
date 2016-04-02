@@ -6,19 +6,19 @@ class PropertiesController < ApplicationController
     datatables: {
       collection: :collection,
       fields: -> (row, res, klass) {[
-        '',
+        row.id,
         [row.price1, row.price2, row.price3],
         [row.rooms, row.floor, row.floors],
         row.address,
         row.more_info,
-        row.images.map{ |i| i.image? && i.image.exists? ? i.image.url : nil }.reject(&:blank?),
+        row.images.map{ |i| i.image? && File.exists?(i.image_path) ? i.image_url : nil }.reject(&:blank?),
         row.state,
         row.contact_info,
         (row.clear_date? ? row.clear_date.strftime('%d.%m.%Y') + (row.clear_date >= Date.today && row.clear_date - 1.month <= Date.today ? '<br/><span class="label label-success">освобождается</span>' : '') : nil),
         (row.request_date? ? row.request_date.strftime('%d.%m.%Y') : nil),
         (row.last_call_date? ? row.last_call_date.strftime('%d.%m.%Y') : nil),
         row.viewed,
-        row.price1, row.price2, row.price3, '', '', '', '', '', '', '', '', '', '', '', ''
+        row.price1, row.price2, row.price3, row.contact_id, row.contact_properties_count, '', '', '', '', '', '', '', '', '', ''
       ]}
     },
     notice: 'Запись успешно сохранена.'
@@ -40,6 +40,8 @@ class PropertiesController < ApplicationController
     if params[:sSearch_1].to_i == 1 # viewed
       cond << "viewed = 't'"
     end
+
+=begin    
     if params[:sSearch_2].present? # address
       #address_q = []
       params[:sSearch_2].split(' ').each do |q|
@@ -70,6 +72,8 @@ class PropertiesController < ApplicationController
       cond << "(" + contact_q.join(' OR ') + ")"
       contact_q = nil
     end
+=end
+
     if params[:sSearch_5].present? && params[:sSearch_6].present?
       from = params[:sSearch_5].to_i
       to = params[:sSearch_6].to_i
@@ -106,6 +110,10 @@ class PropertiesController < ApplicationController
       cond << "images.id IS NULL"
     end
     
+    if params[:sSearch_23].present?
+      cond << "contacts.id = #{params[:sSearch_23]}"
+    end
+    
     conditions = cond.join(' AND ')
     
     (0..26).each do |i|
@@ -116,11 +124,36 @@ class PropertiesController < ApplicationController
          .where(conditions)
          .select(:price1, :rooms, :address, :more_info, :state, "contacts.info as 'contact_info'", :clear_date,
                   :request_date, :last_call_date, :viewed, :rental_date, :request_date,
-                  :price2, :price3, :floor, :floors).uniq
+                  :price2, :price3, :floor, :floors, "properties.id as 'id'").uniq
         
     unless current_user.is_main
       p = p.where("properties.id IN (#{ properties_list })").uniq
     end
+
+    if params[:sSearch_2].present? # address
+      params[:sSearch_2].split(' ').each do |q|
+        p = p.select { |n| n.address.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      end
+    end
+    if params[:sSearch_3].present? # more_info
+      params[:sSearch_3].split(' ').each do |q|
+        p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      end
+    end
+    if params[:sSearch_4].present? # contact
+      params[:sSearch_4].split(' ').each do |q|
+        p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      end
+    end
+
+
+    p = Property.joins("LEFT OUTER JOIN contacts ON contacts.id = properties.contact_id LEFT OUTER JOIN images ON images.property_id = properties.id")
+          .where(id: p.map(&:id))
+          .select(:price1, :rooms, :address, :more_info, :state, "contacts.info as 'contact_info'", :clear_date,
+                    :request_date, :last_call_date, :viewed, :rental_date, :request_date,
+                    :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id, 
+                    "(SELECT COUNT(cp.id) FROM properties cp WHERE cp.contact_id = contacts.id) as 'contact_properties_count'").uniq
+                    
     p
   end
     

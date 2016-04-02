@@ -18,6 +18,10 @@
       .tools= link_to "", "#", class: 'collapse'
     .portlet-body
       = admin_form_tag '/properties', remote: true, class: 'form-horizontal', id: 'filter' do
+        = hidden_field_tag :contact_id, params[:contact_id]
+        - if params[:contact_id]
+          - if contact = Contact.find_by_id(params[:contact_id])
+            %h3.contact_info Контакт: #{ contact.info }
         .form-body
           .row
             - if @district
@@ -131,6 +135,7 @@
         oSettings.oApi._fnReDraw(oSettings);
     };
     
+    filtered_by_contact = false;
     function filterTable() {
       filterParams = {};
       $('.filter_fields select').each(function(){
@@ -146,11 +151,14 @@
       filterParams[1] = $('input[name="text_1"]').first().is(':checked') ? 1 : 0;
       filterParams[21] = $('input[name="text_21"]').first().is(':checked') ? 1 : '';
       filterParams[22] = $('input[name="text_22"]').first().is(':checked') ? 1 : '';
-      
-      setTimeout(function(){ d.datatable.fnMultiFilter(filterParams); }, 500);
+      if (!filtered_by_contact) {
+        filterParams[23] = $('input:hidden[name="contact_id"]').val();
+        filtered_by_contact = true;
+      }
+      setTimeout(function(){ d.datatable.fnMultiFilter(filterParams); }, 100);
     }
   
-    var d = datatables('#data-table', '/properties?contact_id=#{ params[:contact_id] }');
+    var d = datatables('#data-table', '/properties'); // ?contact_id=#{ params[:contact_id] }
     d.init({
       aaSorting: [ [8, 'asc'] ],
       sDom: 'iltrip',
@@ -186,7 +194,7 @@
           });
           return kee.join('/');
         }},
-        {sTitle: "Ориентиры", sWidth: 100, iDataSort: 2, mRender: function(data, type, row){
+        {sTitle: "Ориентиры", sClass: "underline", sWidth: 100, iDataSort: 2, mRender: function(data, type, row){
           return data ? ('<a href="/properties/' + row.id + '/show_modal" data-remote="true">' + data + '</a>') : '';
         }},
         {sTitle: 'Доп. инфо', sWidth: 20, iDataSort: 3 },
@@ -199,7 +207,9 @@
           return imgs;
         }},
         {sTitle: 'Статус', sWidth: 10, sClass: 'center', bSortable: false},
-        {sTitle: 'Контакты', sWidth: 100, bSortable: false },
+        {sTitle: 'Контакты', sClass: "underline", sWidth: 100, bSortable: false, mRender: function(data, type, row){
+          return data + (row.contact_id ? ("<br/><br/><a href='/properties?contact_id=" + row.contact_id + "'>Помещения контакта (" + row.contact_properties_count + ")</a>") : '');
+        }},
         {sTitle: 'Освобождено', sWidth: 10, sClass: 'center', iDataSort: 6, mRender: function(data, type, row){
           if (data == null) {
             return '';
@@ -306,9 +316,10 @@
       
       // Clear filter
       $('.btn-group#clean a').on('click', function(){
-        $('form#filter input[type="text"], input[type="number"], form#filter select').val('');
-        $('form#filter select').select2('val', '');
-        $('form#filter input[type="checkbox"]').attr('checked', false);
+        $('h3.contact_info').remove();
+        $('form#filter').find('input:text, input:hidden, input[type="number"], select').val('')
+                        .filter('select').select2('val', '');
+        $('form#filter').find('input:checkbox').attr('checked', false);
         $.uniform.update('form#filter input[type="checkbox"]');
         d.datatable.fnFilterClear();
         return false;
@@ -320,3 +331,4 @@
         return false;
       });
     });
+    

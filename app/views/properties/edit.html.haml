@@ -14,7 +14,10 @@
 = admin_form_for @property, html: {class: "form-horizontal"} do |f|
   - @property.errors.full_messages.each do |msg|
     %p{ style: "color:#e02222" }= msg
-    
+  
+  
+  = f.hidden_field :old_district, value: @property.item(:district)
+  
   - Category.actives.each do |category|
     - if ['district', 'service_type'].include?(category.un)
       - if @property.new_record?
