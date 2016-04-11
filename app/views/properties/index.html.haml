@@ -208,7 +208,7 @@
         }},
         {sTitle: 'Статус', sWidth: 10, sClass: 'center', bSortable: false},
         {sTitle: 'Контакты', sClass: "underline", sWidth: 100, bSortable: false, mRender: function(data, type, row){
-          return data + (row.contact_id ? ("<br/><br/><a href='/properties?contact_id=" + row.contact_id + "'>Помещения контакта (" + row.contact_properties_count + ")</a>") : '');
+          return data + (row.contact_id ? ("<br/><br/><a href='/properties?contact_id=" + row.contact_id + "'>Помещения контакта (" + (row.contact_properties_count || 0) + ")</a>") : '');
         }},
         {sTitle: 'Освобождено', sWidth: 10, sClass: 'center', iDataSort: 6, mRender: function(data, type, row){
           if (data == null) {
@@ -286,7 +286,7 @@
       
       // Catch text change and update data table
       $('form#filter .text input[type="text"], form#filter .text input[type="number"]').each(function(){
-        $(this).on('keyup paste', function(){
+        $(this).on('keyup paste change', function(){
           delay(filterTable, 1000);
         });
       });

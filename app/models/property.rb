@@ -1,7 +1,7 @@
 # encoding: utf-8
 class Property < ActiveRecord::Base
   
-  attr_accessor :old_district  
+  attr_accessor :old_district
 
   belongs_to :contact
   
@@ -16,6 +16,7 @@ class Property < ActiveRecord::Base
   accepts_nested_attributes_for :property_category_items
     
   after_save :update_local_values
+  after_commit :update_phones
   
   def item(category)
     cat = Category.find_by_un(category.to_s)

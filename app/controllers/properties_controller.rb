@@ -11,7 +11,7 @@ class PropertiesController < ApplicationController
         [row.rooms, row.floor, row.floors],
         row.address,
         row.more_info,
-        row.images.map{ |i| i.image? && File.exists?(i.image_path) ? i.image_url : nil }.reject(&:blank?),
+        row.images.map{ |i| i.image? ? i.image_url : nil }.reject(&:blank?),
         row.state,
         row.contact_info,
         (row.clear_date? ? row.clear_date.strftime('%d.%m.%Y') + (row.clear_date >= Date.today && row.clear_date - 1.month <= Date.today ? '<br/><span class="label label-success">освобождается</span>' : '') : nil),
@@ -111,7 +111,14 @@ class PropertiesController < ApplicationController
     end
     
     if params[:sSearch_23].present?
-      cond << "contacts.id = #{params[:sSearch_23]}"
+      contact_id = params[:sSearch_23]
+      cond << "properties.id IN (SELECT pr.id
+                                 FROM properties pr 
+                                 WHERE pr.contact_id IN (SELECT DISTINCT(phones.contact_id)
+                                                         FROM phones
+                                                         WHERE phones.phone IN (SELECT phone
+                                                                                FROM phones p
+                                                                                WHERE p.contact_id = #{contact_id})))"
     end
     
     conditions = cond.join(' AND ')
@@ -151,8 +158,14 @@ class PropertiesController < ApplicationController
           .where(id: p.map(&:id))
           .select(:price1, :rooms, :address, :more_info, :state, "contacts.info as 'contact_info'", :clear_date,
                     :request_date, :last_call_date, :viewed, :rental_date, :request_date,
-                    :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id, 
-                    "(SELECT COUNT(cp.id) FROM properties cp WHERE cp.contact_id = contacts.id) as 'contact_properties_count'").uniq
+                    :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id,
+                    "(SELECT COUNT(pr.id)
+                      FROM properties pr
+                      WHERE pr.contact_id IN (SELECT DISTINCT(phones.contact_id)
+                                              FROM phones
+                                              WHERE phones.phone IN (SELECT phone
+                                                                     FROM phones p
+                                                                     WHERE p.contact_id = properties.contact_id))) AS 'contact_properties_count'").uniq
                     
     p
   end

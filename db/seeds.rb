@@ -146,4 +146,28 @@ def set_viewed(db_path)
   puts "Done!"
 end
 
-set_viewed('db/realty2')
+# set_viewed('db/realty2')
+
+def update_phones
+  Contact.all.each do |contact|
+    phones = (contact.info || '').split(/\s/).map { |word|
+      if word.length >= 7
+        n = word.scan(/\d/).join('')
+        if n.length >= 7
+          n
+        end
+      end
+    }.reject(&:blank?)
+    
+    if phones.present?
+      puts "Adding phones for #{contact.info}"
+      Phone.transaction do
+        phones.each do |phone|
+          contact.phones.find_or_create_by(phone: phone)
+        end
+      end
+    end
+  end
+end
+
+update_phones
