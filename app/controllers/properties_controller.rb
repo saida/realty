@@ -11,7 +11,7 @@ class PropertiesController < ApplicationController
         [row.rooms, row.floor, row.floors],
         row.address,
         row.more_info,
-        row.images.map{ |i| i.image? ? i.image_url : nil }.reject(&:blank?),
+        row.images.count, # map{ |i| i.image? ? i.image_url : nil }.reject(&:blank?),
         row.state,
         row.contact_info,
         (row.clear_date? ? row.clear_date.strftime('%d.%m.%Y') + (row.clear_date >= Date.today && row.clear_date - 1.month <= Date.today ? '<br/><span class="label label-success">освобождается</span>' : '') : nil),
@@ -159,7 +159,7 @@ class PropertiesController < ApplicationController
           .select(:price1, :rooms, :address, :more_info, :state, "contacts.info as 'contact_info'", :clear_date,
                     :request_date, :last_call_date, :viewed, :rental_date, :request_date,
                     :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id,
-                    "(SELECT COUNT(pr.id)
+                    "(SELECT COUNT(DISTINCT(pr.id))
                       FROM properties pr
                       WHERE pr.contact_id IN (SELECT DISTINCT(phones.contact_id)
                                               FROM phones

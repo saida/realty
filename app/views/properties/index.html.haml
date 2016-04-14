@@ -199,12 +199,15 @@
         }},
         {sTitle: 'Доп. инфо', sWidth: 20, iDataSort: 3 },
         {sTitle: 'Фото', bSortable: false, sWidth: 40, mRender: function(data, type, row){
+          return "Фото (" + data + ")";
+          /*
           var imgs = '<div style="width:65px">';
           for (i = 0; i < data.length; i++) {
             imgs += '<a href="'+ data[i] +'" target="_blank"><img src="' + data[i] + '" width="30" style="margin-right: ' + (i%2 == 0 ? 5 : 0) + 'px; margin-bottom: 5px; max-height:30px; float: left;"></a>';
           }
           imgs += '</div>';
           return imgs;
+          */
         }},
         {sTitle: 'Статус', sWidth: 10, sClass: 'center', bSortable: false},
         {sTitle: 'Контакты', sClass: "underline", sWidth: 100, bSortable: false, mRender: function(data, type, row){
