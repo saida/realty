@@ -47,8 +47,11 @@
     .row
       %label.col-md-3 Контакты
       %label.col-md-5= contact.info
-      %label.col-md-4= link_to "Помещения контакта (#{contact.properties.count})", properties_path(contact_id: contact), target: "_blank"
-    
+      
+      - count = Property.count_by_sql("SELECT COUNT(pr.id) FROM properties pr WHERE pr.contact_id IN (SELECT DISTINCT(phones.contact_id) FROM phones WHERE phones.phone IN (SELECT phone FROM phones p WHERE p.contact_id = #{contact.id}))")
+      
+      %label.col-md-4= link_to "Помещения контакта (#{count})", properties_path(contact_id: contact), target: "_blank"
+          
   %hr/
   .row
     %label.col-md-3 Дата заявки
