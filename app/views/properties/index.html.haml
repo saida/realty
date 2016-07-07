@@ -180,7 +180,7 @@
           var prices = [];
           $(data).each(function(i, arr){
             var service_type = arr[0] || '';
-            service_type = service_type.toLowerCase() == 'продажа' ? 'прод.' : service_type.toLowerCase() == 'сдача в аренду' ? 'ар.' : service_type.toLowerCase() == 'сдача в аренду (посуточно)' ? 'ар. посут.' : service_type;
+            service_type = service_type.length == 0 ? '' : service_type.toLowerCase() == 'продажа' ? 'прод.' : service_type.toLowerCase() == 'сдача в аренду' ? 'ар.' : service_type.toLowerCase() == 'сдача в аренду (посуточно)' ? 'ар. посут.' : service_type;
             var n = arr[1];
             if (n !== '' && n != null && n !== 'undefined')
                 prices.push(service_type + ' $' + n.toMoney(0));

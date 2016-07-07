@@ -24,11 +24,13 @@
         - items = []
       - else
         - items = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item).order("property_category_items.id")
-      - (3 - items.size).times { items << @property.property_category_items.build }
+      - (3 - items.size).times { items << @property.property_category_items.build( weight: ([1, 2, 3] - items.map(&:weight).reject(&:blank?) ).min ) }
+      - items.sort_by! { |i| i.weight.to_i }
       .row
         - items.each_with_index do |item, index|
           = f.admin_fields_for :property_category_items, item do |pf|
             %div{ class: "col-md-#{ index == 0 ? 4 : 2 }", style: index != 2 ? 'margin-right:70px' : nil }
+              = pf.hidden_field :weight, value: item.weight || (index + 1)
               = pf.select :category_item_id, category.category_items.selectables, { selected: (@property.new_record? ? (index == 0 ? category.default_item_id : nil) : item.category_item_id), include_blank: '-', label: (index == 0 ? category.name + (category.un == 'service_type' ? ' <span class="required">*</span>' : '') : '').html_safe, field_class: (index == 0 ? "col-md-6" : nil), label_class: (index == 0 ? "col-md-6" : nil), help_block: (category.un == 'service_type' && index == 0 ? '<span class="error">Это поле необходимо заполнить.</span>'.html_safe : nil) }
             
       - if category.un == 'service_type'

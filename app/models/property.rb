@@ -38,8 +38,13 @@ class Property < ActiveRecord::Base
   end
   
   def service_types
-    items = category_items.where(category_id: Category.find_by_un('service_type').id).order("property_category_items.id").pluck(:name)
-    items
+    _types = [nil, nil, nil]
+    pairs = category_items.where(category_id: Category.find_by_un('service_type').id).order("property_category_items.weight").pluck("property_category_items.id", "property_category_items.weight", :name)
+    pairs.each_with_index do |pair, idx|
+      _idx = pair[1].nil? ? idx : pair[1] - 1
+      _types[_idx] = pair[2]
+    end
+    _types
   end
   
   def self.of_user(user)
