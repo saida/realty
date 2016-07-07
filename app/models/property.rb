@@ -91,7 +91,7 @@ class Property < ActiveRecord::Base
           
           if File.exists?(old_path_with_filename) && old_path_with_filename != File.join(new_path, filename)
             FileUtils.mkdir_p new_path
-            FileUtils.mv old_path_with_filename, File.join(new_path) # , filename)
+            FileUtils.mv old_path_with_filename, new_path
             
             # delete old empty folder
             if Dir[old_path.to_s + '/*'].empty?

@@ -71,7 +71,7 @@ class Image < ActiveRecord::Base
         if File.exists?(old_path_with_filename) && old_path_with_filename != File.join(new_path, filename)
           puts "Adding ID to image path: #{new_path}"
           FileUtils.mkdir_p new_path
-          FileUtils.mv old_path_with_filename, File.join(new_path)
+          FileUtils.mv old_path_with_filename, new_path
         end
 
         image.save # to update the locally saved image_urls
@@ -88,7 +88,7 @@ class Image < ActiveRecord::Base
           puts "Moving #{old_path_with_filename}..."
           new_path = path.gsub(Regexp.new("/#{image.property_id}.*"), "") + "/#{image.property_id}"
           FileUtils.mkdir_p new_path
-          FileUtils.mv old_path_with_filename, File.join(new_path)
+          FileUtils.mv old_path_with_filename, new_path
         end
       end
     end
