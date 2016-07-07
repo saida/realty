@@ -5,9 +5,11 @@ class PropertiesController < ApplicationController
   resources Property,
     datatables: {
       collection: :collection,
-      fields: -> (row, res, klass) {[
+      fields: -> (row, res, klass) {
+        service_types = row.service_types
+      [
         row.id,
-        [row.price1, row.price2, row.price3],
+        [[service_types[0], row.price1], [service_types[1], row.price2], [service_types[2], row.price3]],
         [row.rooms, row.floor, row.floors],
         row.address,
         row.more_info,

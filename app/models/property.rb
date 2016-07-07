@@ -37,6 +37,11 @@ class Property < ActiveRecord::Base
     items.join(', ') if items.present?
   end
   
+  def service_types
+    items = category_items.where(category_id: Category.find_by_un('service_type').id).order("property_category_items.id").pluck(:name)
+    items
+  end
+  
   def self.of_user(user)
     if user.is_main
       all

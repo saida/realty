@@ -23,7 +23,7 @@
       - if @property.new_record?
         - items = []
       - else
-        - items = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item)
+        - items = @property.property_category_items.includes(:category_item).where("category_items.category_id = #{category.id}").references(:category_item).order("property_category_items.id")
       - (3 - items.size).times { items << @property.property_category_items.build }
       .row
         - items.each_with_index do |item, index|

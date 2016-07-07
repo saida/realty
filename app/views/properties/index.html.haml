@@ -178,11 +178,14 @@
         },
         {sTitle: 'Цена', sWidth: 20, sClass: 'center', iDataSort: [0, 12, 13], mRender: function(data, type, row){
           var prices = [];
-          $(data).each(function(i, n){
+          $(data).each(function(i, arr){
+            var service_type = arr[0] || '';
+            service_type = service_type.toLowerCase() == 'продажа' ? 'прод.' : service_type.toLowerCase() == 'аренда' ? 'ар.' : service_type;
+            var n = arr[1];
             if (n !== '' && n != null && n !== 'undefined')
-                prices.push('$' + n.toMoney(0));
+                prices.push(service_type + ' $' + n.toMoney(0));
           });
-          return prices.join(', ');
+          return prices.join(',<br/>');
         }},
         {sTitle: 'к/э/э', sWidth: 50, sClass: 'center', bSortable: false, mRender: function(data, type, row){
           var kee = [];
@@ -197,7 +200,9 @@
         {sTitle: "Ориентиры", sClass: "underline", sWidth: 100, iDataSort: 2, mRender: function(data, type, row){
           return data ? ('<a href="/properties/' + row.id + '/show_modal" data-remote="true">' + data + '</a>') : '';
         }},
-        {sTitle: 'Доп. инфо', sWidth: 20, iDataSort: 3 },
+        {sTitle: 'Доп. инфо', sWidth: 20, iDataSort: 3, sClass: "center", mRender: function(data, type, row){
+          return "ID: " + row.id + "<br/><br/>" + (data || '');
+        }},
         {sTitle: 'Фото', bSortable: false, sWidth: 40, mRender: function(data, type, row){
           return "Фото (" + data + ")";
           /*
