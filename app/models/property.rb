@@ -67,7 +67,9 @@ class Property < ActiveRecord::Base
     
     Property.where(id: id).update_all(rooms: r, floor: f, floors: fs, address: a, state: s)
     
-    if images.count > 0
+    _images = images
+    
+    if _images.count > 0
       
       _district_old = Russian.translit((old_district.present? ? old_district : '-').to_s.force_encoding('utf-8'))
       _district = Russian.translit((item(:district) || '-').to_s.force_encoding('utf-8'))
@@ -79,10 +81,10 @@ class Property < ActiveRecord::Base
       _price = [price1, price2, price3].reject(&:blank?).join(' ')
       info_old = "#{_kee_old} #{_landmark_old} #{_price_old}"
       info = "#{_kee} #{_landmark} #{_price}"
-      old_path = Rails.root.join('public', 'photos', _district_old, info_old, self.id)
-      new_path = Rails.root.join('public', 'photos', _district, info, self.id)
+      old_path = Rails.root.join('public', 'photos', _district_old, info_old, self.id.to_s)
+      new_path = Rails.root.join('public', 'photos', _district, info, self.id.to_s)
       
-      images.each do |image|
+      _images.each do |image|
         if image.image?
           filename = image.short_name  #  image.image_file_name
           old_path_with_filename = File.join(old_path, filename)
@@ -92,8 +94,13 @@ class Property < ActiveRecord::Base
             FileUtils.mv old_path_with_filename, File.join(new_path) # , filename)
             
             # delete old empty folder
-            if image == images.last && Dir[old_path.to_s + '/*'].empty?
+            if Dir[old_path.to_s + '/*'].empty?
               FileUtils.rm_rf old_path
+              
+              old_parent_path = File.expand_path("..", old_path)
+              if Dir[old_parent_path + "/*"].empty?
+                FileUtils.rm_rf old_parent_path
+              end
             end
           end
           
