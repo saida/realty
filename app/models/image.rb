@@ -77,5 +77,20 @@ class Image < ActiveRecord::Base
         image.save # to update the locally saved image_urls
       end
     end
-  end  
+  end
+  
+  def self.move_images
+    all.each do |image|
+      path = image.image_path.to_s
+      unless File.exists?(path)
+        old_path_with_filename = path.gsub("/#{image.property_id}", "")
+        if File.exists?(old_path_with_filename)
+          puts "Moving #{old_path_with_filename}..."
+          new_path = path.gsub(Regexp.new("/#{image.property_id}.*"), "") + "/#{image.property_id}"
+          FileUtils.mkdir_p new_path
+          FileUtils.mv old_path_with_filename, File.join(new_path)
+        end
+      end
+    end
+  end
 end

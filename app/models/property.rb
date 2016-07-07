@@ -79,8 +79,8 @@ class Property < ActiveRecord::Base
       _price = [price1, price2, price3].reject(&:blank?).join(' ')
       info_old = "#{_kee_old} #{_landmark_old} #{_price_old}"
       info = "#{_kee} #{_landmark} #{_price}"
-      old_path = Rails.root.join('public', 'photos', _district_old, info_old)
-      new_path = Rails.root.join('public', 'photos', _district, info)
+      old_path = Rails.root.join('public', 'photos', _district_old, info_old, self.id)
+      new_path = Rails.root.join('public', 'photos', _district, info, self.id)
       
       images.each do |image|
         if image.image?
