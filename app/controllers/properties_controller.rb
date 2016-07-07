@@ -138,19 +138,22 @@ class PropertiesController < ApplicationController
     end
 
     if params[:sSearch_2].present? # address
-      params[:sSearch_2].split(' ').each do |q|
-        p = p.select { |n| n.address.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
-      end
+      q = params[:sSearch_2].split(' ').map { |c| c.mb_chars.downcase }.join("|")
+      p = p.select { |n| n.address.to_s.mb_chars.downcase.index(Regexp.new(q)) }
     end
     if params[:sSearch_3].present? # more_info
-      params[:sSearch_3].split(' ').each do |q|
-        p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
-      end
+      # params[:sSearch_3].split(' ').each do |q|
+      #   p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      # end
+      q = params[:sSearch_3].split(' ').map { |c| c.mb_chars.downcase }.join("|")
+      p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(Regexp.new(q)) }
     end
     if params[:sSearch_4].present? # contact
-      params[:sSearch_4].split(' ').each do |q|
-        p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
-      end
+      q = params[:sSearch_4].split(' ').map { |c| c.mb_chars.downcase }.join("|")
+      p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(Regexp.new(q)) }
+      # params[:sSearch_4].split(' ').each do |q|
+      #   p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      # end
     end
 
 

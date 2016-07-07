@@ -62,40 +62,43 @@ class Property < ActiveRecord::Base
     
     Property.where(id: id).update_all(rooms: r, floor: f, floors: fs, address: a, state: s)
     
-    images.each do |image|
-      if image.image?
-        _district_old = Russian.translit((old_district.present? ? old_district : '-').to_s.force_encoding('utf-8'))
-        _district = Russian.translit((item(:district) || '-').to_s.force_encoding('utf-8'))
-        _landmark_old = Russian.translit(landmark_was.to_s.gsub(/[\x00\/\\:\*\?\"<>\|]/, '').force_encoding('utf-8')).gsub(/[\xC2\xBB|\xC2\xAB]/, '').to_s.strip
-        _landmark = Russian.translit(landmark.to_s.gsub(/[\x00\/\\:\*\?\"<>\|]/, '').force_encoding('utf-8')).gsub(/[\xC2\xBB|\xC2\xAB]/, '').to_s.strip
-        _kee_old = "#{rooms.to_s[/\d+/]}-#{floor.to_s[/\d+/]}-#{floors.to_s[/\d+/]}"
-        _kee = "#{r.to_s[/\d+/]}-#{f.to_s[/\d+/]}-#{fs.to_s[/\d+/]}"
-        _price_old = [price1_was, price2_was, price3_was].reject(&:blank?).join(' ')
-        _price = [price1, price2, price3].reject(&:blank?).join(' ')
-        info_old = "#{_kee_old} #{_landmark_old} #{_price_old}"
-        info = "#{_kee} #{_landmark} #{_price}"
-        filename = image.short_name  #  image.image_file_name
-        old_path = Rails.root.join('public', 'photos', _district_old, info_old)
-        old_path_with_filename = File.join(old_path, filename)
-        
-        new_path = Rails.root.join('public', 'photos', _district, info)
-        
-        if File.exists?(old_path_with_filename) && old_path_with_filename != File.join(new_path, filename)
-          FileUtils.mkdir_p new_path
-          FileUtils.mv old_path_with_filename, File.join(new_path) # , filename)
+    if images.count > 0
+      
+      _district_old = Russian.translit((old_district.present? ? old_district : '-').to_s.force_encoding('utf-8'))
+      _district = Russian.translit((item(:district) || '-').to_s.force_encoding('utf-8'))
+      _landmark_old = Russian.translit(landmark_was.to_s.gsub(/[\x00\/\\:\*\?\"<>\|]/, '').force_encoding('utf-8')).gsub(/[\xC2\xBB|\xC2\xAB]/, '').to_s.strip
+      _landmark = Russian.translit(landmark.to_s.gsub(/[\x00\/\\:\*\?\"<>\|]/, '').force_encoding('utf-8')).gsub(/[\xC2\xBB|\xC2\xAB]/, '').to_s.strip
+      _kee_old = "#{rooms.to_s[/\d+/]}-#{floor.to_s[/\d+/]}-#{floors.to_s[/\d+/]}"
+      _kee = "#{r.to_s[/\d+/]}-#{f.to_s[/\d+/]}-#{fs.to_s[/\d+/]}"
+      _price_old = [price1_was, price2_was, price3_was].reject(&:blank?).join(' ')
+      _price = [price1, price2, price3].reject(&:blank?).join(' ')
+      info_old = "#{_kee_old} #{_landmark_old} #{_price_old}"
+      info = "#{_kee} #{_landmark} #{_price}"
+      old_path = Rails.root.join('public', 'photos', _district_old, info_old)
+      new_path = Rails.root.join('public', 'photos', _district, info)
+      
+      images.each do |image|
+        if image.image?
+          filename = image.short_name  #  image.image_file_name
+          old_path_with_filename = File.join(old_path, filename)
           
-          # delete old empty folder
-          if image == images.last && Dir[old_path.to_s + '/*'].empty?
-            FileUtils.rm_rf old_path
+          if File.exists?(old_path_with_filename) && old_path_with_filename != File.join(new_path, filename)
+            FileUtils.mkdir_p new_path
+            FileUtils.mv old_path_with_filename, File.join(new_path) # , filename)
+            
+            # delete old empty folder
+            if image == images.last && Dir[old_path.to_s + '/*'].empty?
+              FileUtils.rm_rf old_path
+            end
           end
+          
+          image.save # to update the locally saved image_urls
         end
-        
-        image.save # to update the locally saved image_urls
       end
     end
   end
-  
+    
   def self.update_local_values
     CategoryItem.all.each { |i| i.update_properties }
-  end
+  end  
 end

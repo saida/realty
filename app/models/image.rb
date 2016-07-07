@@ -6,7 +6,7 @@ class Image < ActiveRecord::Base
   Paperclip.interpolates :district do |attachment, style|
     Russian.translit(attachment.instance.district.force_encoding('utf-8'))
   end
-    
+  
   Paperclip.interpolates :info do |attachment, style|
     property = attachment.instance.property
     if property.rooms? || property.floor? || property.floors?
@@ -18,22 +18,18 @@ class Image < ActiveRecord::Base
     price = [property.price1, property.price2, property.price3].reject(&:blank?).join(' ')
     "#{kee} #{landmark} #{price}"
   end
+  
+  Paperclip.interpolates :property_id do |attachment, style|
+    attachment.instance.property_id
+  end
 
   Paperclip.interpolates :name do |attachment, style|
-    # f = attachment.original_filename
-    # if File.basename(f).length > 30
-    #   e = File.extname(f)
-    #   b = File.basename(f).truncate(30, omission: '')
-    #   return b.to_s + e.to_s
-    # else
-    #   return f
-    # end
     attachment.instance.short_name
   end
   
   has_attached_file :image,
-                path: ':rails_root/public/photos/:district/:info/:name',
-                url: '/photos/:district/:info/:name'
+                path: ':rails_root/public/photos/:district/:info/:property_id/:name',
+                url: '/photos/:district/:info/:property_id/:name'
   
   validates_attachment_content_type :image, content_type: /image/
   
@@ -63,4 +59,23 @@ class Image < ActiveRecord::Base
       self.save
     end
   end
+  
+  def self.add_property_id_to_image_paths
+    all.each do |image|
+      if image.image?
+        
+        old_path_with_filename = image.image_path
+        filename = image.short_name
+        new_path = image.image.path.to_s.sub("/#{filename}", "")
+        
+        if File.exists?(old_path_with_filename) && old_path_with_filename != File.join(new_path, filename)
+          puts "Adding ID to image path: #{new_path}"
+          FileUtils.mkdir_p new_path
+          FileUtils.mv old_path_with_filename, File.join(new_path)
+        end
+
+        image.save # to update the locally saved image_urls
+      end
+    end
+  end  
 end
