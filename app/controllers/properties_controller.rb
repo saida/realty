@@ -148,7 +148,7 @@ class PropertiesController < ApplicationController
       #   p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
       # end
       q = params[:sSearch_3].split(' ').map { |c| c.mb_chars.downcase }.join("|")
-      p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(Regexp.new(q)) }
+      p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(Regexp.new(q)) || n.id.to_s.index(Regexp.new(q)) }
     end
     if params[:sSearch_4].present? # contact
       q = params[:sSearch_4].split(' ').map { |c| c.mb_chars.downcase }.join("|")

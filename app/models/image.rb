@@ -16,7 +16,7 @@ class Image < ActiveRecord::Base
     end
     landmark = Russian.translit(property.landmark.to_s.gsub(/[\x00\/\\:\*\?\"<>\|]/, '').force_encoding('utf-8')).gsub(/[\xC2\xBB|\xC2\xAB]/, '').to_s.strip
     price = [property.price1, property.price2, property.price3].reject(&:blank?).join(' ')
-    "#{kee} #{landmark} #{price}"
+    "#{kee} #{landmark} #{price}".strip
   end
   
   Paperclip.interpolates :property_id do |attachment, style|
@@ -35,7 +35,7 @@ class Image < ActiveRecord::Base
   
   after_save :update_image_url
   
-  def  district
+  def district
     item = property.item(:district)
     item.present? ? item : '-'
   end

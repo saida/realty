@@ -84,8 +84,8 @@ class Property < ActiveRecord::Base
       _kee = "#{r.to_s[/\d+/]}-#{f.to_s[/\d+/]}-#{fs.to_s[/\d+/]}"
       _price_old = [price1_was, price2_was, price3_was].reject(&:blank?).join(' ')
       _price = [price1, price2, price3].reject(&:blank?).join(' ')
-      info_old = "#{_kee_old} #{_landmark_old} #{_price_old}"
-      info = "#{_kee} #{_landmark} #{_price}"
+      info_old = "#{_kee_old} #{_landmark_old} #{_price_old}".strip
+      info = "#{_kee} #{_landmark} #{_price}".strip
       old_path = Rails.root.join('public', 'photos', _district_old, info_old, self.id.to_s)
       new_path = Rails.root.join('public', 'photos', _district, info, self.id.to_s)
       
