@@ -180,7 +180,7 @@
           var prices = [];
           $(data).each(function(i, arr){
             var service_type = arr[0] || '';
-            service_type = service_type.length == 0 ? '' : service_type.toLowerCase() == 'продажа' ? 'прод.' : service_type.toLowerCase() == 'сдача в аренду' ? 'ар.' : service_type.toLowerCase() == 'сдача в аренду (посуточно)' ? 'ар. посут.' : service_type;
+            service_type = service_type.length == 0 ? ''  : service_type.toLowerCase() == 'продажа' ? 'прод.' : service_type.toLowerCase() == 'сдача в аренду' ? 'ар.' : service_type.toLowerCase() == 'сдача в аренду (посуточно)' ? 'ар. посут.' : service_type;
             var n = arr[1];
             if (n !== '' && n != null && n !== 'undefined')
                 prices.push(service_type + ' $' + n.toMoney(0));
@@ -204,7 +204,7 @@
           return "ID: " + row.id + (data ? ("<hr style='border-top: 1px solid #ccc' />" + data) : '');
         }},
         {sTitle: 'Фото', bSortable: false, sWidth: 40, mRender: function(data, type, row){
-          return "Фото (" + data + ")";
+          return "Фото&nbsp;(" + data + ")";
           /*
           var imgs = '<div style="width:65px">';
           for (i = 0; i < data.length; i++) {
@@ -218,14 +218,14 @@
         {sTitle: 'Контакты', sClass: "underline", sWidth: 100, bSortable: false, mRender: function(data, type, row){
           if (!data)
             return '';
-          return data + (row.contact_id ? ("<br/><br/><a href='/properties?contact_id=" + row.contact_id + "'>Помещения контакта (" + (row.contact_properties_count || 0) + ")</a>") : '');
+          return data + (row.contact_id ? ("<br/><br/><a href='/properties?contact_id=" + row.contact_id + "' target='_blank'>Помещения контакта (" + (row.contact_properties_count || 0) + ")</a>") : '');
         }},
         {sTitle: 'Освоб.', sWidth: 10, sClass: 'center', iDataSort: 6, mRender: function(data, type, row){
           return data || '';
         }},
         {sTitle: 'Дата заявки', sWidth: 10, sClass: 'center', iDataSort: 7 },
         {sTitle: 'Дата общения', sWidth: 10, sClass: 'center', iDataSort: 8 },
-        {sTitle: 'Осмотрено', sWidth: 2, sClass: 'center', bSortable: false, mRender: function(data, type, row){
+        {sTitle: 'Осмотрено', sWidth: 4, sClass: 'center', bSortable: false, mRender: function(data, type, row){
           if (data == null) {
             return '<a class="viewed yes" href="/properties/' + row.id + '/toggle_viewed?n=1" data-remote="true">Да</a><a class="viewed no" href="/properties/' + row.id + '/toggle_viewed?n=0" data-remote="true">Нет</a><span class="label label-sm label-default">--</span>';
           } else if (data == true) {
