@@ -66,7 +66,7 @@ class PropertiesController < ApplicationController
     end
     if params[:sSearch_4].present? # contact
       contact_q = []
-      params[:sSearch_4].split(' ').each do |q|
+      params[:sSearch_4].split(/\s/).each do |q|
         # join words by not AND but OR
         # cond << "(contacts.info LIKE '%#{q}%' OR contacts.info LIKE '%#{q.mb_chars.capitalize.to_s}%')"
         contact_q << "(contacts.info LIKE '%#{q}%' OR contacts.info LIKE '%#{q.mb_chars.capitalize.to_s}%')"
@@ -113,6 +113,8 @@ class PropertiesController < ApplicationController
     end
     
     if params[:sSearch_23].present?
+      # cond << "contacts.id = #{params[:sSearch_23]}"
+      
       contact_id = params[:sSearch_23]
       cond << "properties.id IN (SELECT pr.id
                                  FROM properties pr 
@@ -140,22 +142,25 @@ class PropertiesController < ApplicationController
     end
 
     if params[:sSearch_2].present? # address
+      #params[:sSearch_2].split(' ').each do |q|
+       # p = p.select { |n| n.address.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      # end
       q = params[:sSearch_2].split(' ').map { |c| c.mb_chars.downcase }.join("|")
       p = p.select { |n| n.address.to_s.mb_chars.downcase.index(Regexp.new(q)) }
     end
     if params[:sSearch_3].present? # more_info
-      # params[:sSearch_3].split(' ').each do |q|
-      #   p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      #params[:sSearch_3].split(' ').each do |q|
+       # p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
       # end
       q = params[:sSearch_3].split(' ').map { |c| c.mb_chars.downcase }.join("|")
       p = p.select { |n| n.more_info.to_s.mb_chars.downcase.index(Regexp.new(q)) || n.id.to_s.index(Regexp.new(q)) }
     end
     if params[:sSearch_4].present? # contact
+      #params[:sSearch_4].split(' ').each do |q|
+      #  p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
+      # end
       q = params[:sSearch_4].split(' ').map { |c| c.mb_chars.downcase }.join("|")
       p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(Regexp.new(q)) }
-      # params[:sSearch_4].split(' ').each do |q|
-      #   p = p.select { |n| n.contact_info.to_s.mb_chars.downcase.index(q.mb_chars.downcase) }
-      # end
     end
 
 
@@ -163,7 +168,7 @@ class PropertiesController < ApplicationController
           .where(id: p.map(&:id))
           .select(:price1, :rooms, :address, :more_info, :state, "contacts.info as 'contact_info'", :clear_date,
                     :request_date, :last_call_date, :viewed, :rental_date, :request_date,
-                    :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id,
+                    :price2, :price3, :floor, :floors, "properties.id as 'id'", :contact_id, 
                     "(SELECT COUNT(DISTINCT(pr.id))
                       FROM properties pr
                       WHERE pr.contact_id IN (SELECT DISTINCT(phones.contact_id)
