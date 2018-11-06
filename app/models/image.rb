@@ -6,7 +6,7 @@ class Image < ActiveRecord::Base
   Paperclip.interpolates :district do |attachment, style|
     Russian.translit(attachment.instance.district.force_encoding('utf-8'))
   end
-  
+    
   Paperclip.interpolates :info do |attachment, style|
     property = attachment.instance.property
     if property.rooms? || property.floor? || property.floors?
@@ -22,19 +22,19 @@ class Image < ActiveRecord::Base
   Paperclip.interpolates :property_id do |attachment, style|
     attachment.instance.property_id
   end
-
+  
   Paperclip.interpolates :name do |attachment, style|
     attachment.instance.short_name
   end
   
   has_attached_file :image,
-                path: ':rails_root/public/photos/:district/:info/:property_id/:name',
-                url: '/photos/:district/:info/:property_id/:name'
+                path: ':rails_root/public/YandexDisk/photos/:district/:info/:property_id/:name',
+                url: '/YandexDisk/photos/:district/:info/:property_id/:name'
   
   validates_attachment_content_type :image, content_type: /image/
   
   after_save :update_image_url
-  
+
   def district
     item = property.item(:district)
     item.present? ? item : '-'
@@ -50,7 +50,7 @@ class Image < ActiveRecord::Base
       return f
     end
   end
-  
+
   def update_image_url
     img_path = self.image.path
     unless self.image? && self.image_path == img_path
@@ -78,8 +78,8 @@ class Image < ActiveRecord::Base
       end
     end
   end
-  
-  def self.move_images
+	
+	def self.move_images
     all.each do |image|
       path = image.image_path.to_s
       unless File.exists?(path)
