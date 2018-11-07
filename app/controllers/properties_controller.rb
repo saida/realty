@@ -333,10 +333,17 @@ class PropertiesController < ApplicationController
     property = Property.find(params[:id])
     img = property.images.last
     isWindows = request.env['HTTP_USER_AGENT'].to_s.downcase.match(/windows/i)
+    dir = img.image.path.to_s.gsub(img.image_file_name, '')
+    i = 0
+    until Dir.exists?(dir) || i == 2
+      dir = dir.split('/')[0..-2].join('/')
+      i += 1
+    end
     if isWindows
-      system("explorer \"#{img.image.path.to_s.gsub(img.image_file_name, '').gsub(/\//, "\\")}\"")
+      dir = dir.gsub(/\//, "\\")
+      system("explorer \"#{dir}\"")
     else
-      system("open \"#{img.image.path.to_s.gsub(img.image_file_name, '')}\"")
+      system("open \"#{dir}\"")
     end
     render nothing: true
   end

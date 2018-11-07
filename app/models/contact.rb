@@ -18,12 +18,12 @@ class Contact < ActiveRecord::Base
       .where(user.is_main ? '' : ["properties.id IN (#{user.properties_list})"])
   end
   
-  def after_save
-    update_attributes!(properties_count: properties.size)
+  def after_save 
+    update!(properties_count: properties.size)
   end
   
   def update_properties_count
-    properties_count = properties.size
+    # self.properties_count = properties.size
   end
   
   def self.update_properties_count # takes a long time
